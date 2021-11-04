@@ -7,7 +7,7 @@ export const SectionCards = ({ title, videos = [], size = 'medium' }) => {
       <h2 className={style.title}>{title}</h2>
       <div className={style.cardWrapper}>
         {videos.map((video) => (
-          <Card size={size} imageUrl={video.imageUrl} />
+          <Card key={video.id} size={size} imageUrl={video.imageUrl} />
         ))}
       </div>
     </section>

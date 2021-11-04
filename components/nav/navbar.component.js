@@ -1,12 +1,15 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { magic } from '../../lib/magic-client';
+
 import styles from './navbar.module.css';
 
 import { useRouter } from 'next/router';
 import Image from 'next/image';
 
-export const NavBar = ({ username }) => {
+export const NavBar = () => {
   const router = useRouter();
   const [showDropdown, setShowDropdown] = useState(false);
+  const [username, setUsername] = useState('');
 
   const handleOnClickHome = (e) => {
     e.preventDefault();
@@ -22,6 +25,27 @@ export const NavBar = ({ username }) => {
     e.preventDefault();
     setShowDropdown(!showDropdown);
   };
+
+  const handleSignOut = async (e) => {
+    e.preventDefault();
+    try {
+      await magic.user.logout();
+      router.push('/login');
+    } catch (error) {
+      router.push('/login');
+    }
+  };
+
+  useEffect(async () => {
+    try {
+      const { email } = await magic.user.getMetadata();
+      if (email) {
+        setUsername(email);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
 
   return (
     <div className={styles.container}>
@@ -49,7 +73,6 @@ export const NavBar = ({ username }) => {
           <div>
             <button onClick={handleShowDropdown} className={styles.usernameBtn}>
               <p className={styles.username}>{username}</p>
-              {/** Expand more icon */}
               <Image
                 src={'/static/expand_more.svg'}
                 alt='Expand dropdown'
@@ -60,8 +83,9 @@ export const NavBar = ({ username }) => {
             {showDropdown && (
               <div className={styles.navDropdown}>
                 <div>
-                  <a className={styles.linkName}>Sign out</a>
-                  <div className={styles.lineWrapper}></div>
+                  <a onClick={handleSignOut} className={styles.linkName}>
+                    Sign out
+                  </a>
                 </div>
               </div>
             )}
